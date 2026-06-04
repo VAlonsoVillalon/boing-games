@@ -1,30 +1,53 @@
 const soundAnimals = [
-  { name: 'gato', emoji: '🐱', sound: 'Miau' },
-  { name: 'perro', emoji: '🐶', sound: 'Guau' },
-  { name: 'vaca', emoji: '🐄', sound: 'Muu' },
-  { name: 'pato', emoji: '🦆', sound: 'Cuac' }
+  { name: 'gato', emoji: '🐱', sounds: [800, 1000] },
+  { name: 'perro', emoji: '🐶', sounds: [600, 400, 500] },
+  { name: 'vaca', emoji: '🐄', sounds: [200, 150] },
+  { name: 'pato', emoji: '🦆', sounds: [900, 850, 900] }
 ];
 
 let soundState = {
   currentAnimal: null,
   answered: [],
-  isDisabled: false
+  isDisabled: false,
+  audioContext: null
 };
 
 function initSoundsGame() {
   soundState = {
     currentAnimal: null,
     answered: [],
-    isDisabled: false
+    isDisabled: false,
+    audioContext: new (window.AudioContext || window.webkitAudioContext)()
   };
 
   const game = document.getElementById('soundsGame');
   game.innerHTML = '';
 
+  // Crear botón para reproducir sonido
+  const playButton = document.createElement('button');
+  playButton.style.width = '100%';
+  playButton.style.marginBottom = '2rem';
+  playButton.style.padding = '16px';
+  playButton.style.background = '#00D4FF';
+  playButton.style.color = 'white';
+  playButton.style.border = 'none';
+  playButton.style.borderRadius = '12px';
+  playButton.style.fontSize = '16px';
+  playButton.style.fontWeight = '600';
+  playButton.style.cursor = 'pointer';
+  playButton.textContent = '🔊 Escucha el sonido';
+  playButton.addEventListener('click', () => playRandomSound());
+
   // Select random animal
-  playRandomSound();
+  const animal = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
+  soundState.currentAnimal = animal.name;
 
   // Create buttons
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.style.display = 'grid';
+  buttonsContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  buttonsContainer.style.gap = '12px';
+
   const shuffled = [...soundAnimals].sort(() => Math.random() - 0.5);
 
   shuffled.forEach((animal) => {
@@ -35,31 +58,32 @@ function initSoundsGame() {
       <span class="sound-label">${animal.name}</span>
     `;
     btn.addEventListener('click', () => checkSound(btn, animal.name));
-    game.appendChild(btn);
+    buttonsContainer.appendChild(btn);
   });
+
+  game.appendChild(playButton);
+  game.appendChild(buttonsContainer);
+
+  // Play initial sound
+  setTimeout(() => playRandomSound(), 300);
 }
 
 function playRandomSound() {
-  const animal = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
-  soundState.currentAnimal = animal.name;
+  const animal = soundAnimals.find(a => a.name === soundState.currentAnimal);
+  if (!animal) return;
 
-  // Use Web Audio API to generate sound
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  
-  if (animal.name === 'gato') {
-    playTone(audioContext, 1200, 0.2, 0.1);
-  } else if (animal.name === 'perro') {
-    playTone(audioContext, 800, 0.3, 0.15);
-    setTimeout(() => playTone(audioContext, 900, 0.2, 0.1), 200);
-  } else if (animal.name === 'vaca') {
-    playTone(audioContext, 200, 0.4, 0.3);
-  } else if (animal.name === 'pato') {
-    playTone(audioContext, 600, 0.2, 0.1);
-    setTimeout(() => playTone(audioContext, 700, 0.2, 0.1), 150);
-  }
+  // Reproducir secuencia de sonidos
+  let delay = 0;
+  animal.sounds.forEach((freq, idx) => {
+    setTimeout(() => {
+      playBeep(freq, 0.15);
+    }, delay);
+    delay += 200;
+  });
 }
 
-function playTone(audioContext, frequency, duration, volume = 0.3) {
+function playBeep(frequency, duration = 0.15) {
+  const audioContext = soundState.audioContext;
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
 
@@ -67,7 +91,9 @@ function playTone(audioContext, frequency, duration, volume = 0.3) {
   gainNode.connect(audioContext.destination);
 
   oscillator.frequency.value = frequency;
-  gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+  oscillator.type = 'sine';
+
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
   gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
 
   oscillator.start(audioContext.currentTime);
@@ -91,6 +117,14 @@ function checkSound(button, animalName) {
         document.querySelectorAll('.sound-btn').forEach(btn => {
           btn.classList.remove('correct', 'wrong');
         });
+        
+        // Pick new animal
+        let newAnimal;
+        do {
+          newAnimal = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
+        } while (soundState.answered.includes(newAnimal.name));
+        
+        soundState.currentAnimal = newAnimal.name;
         soundState.isDisabled = false;
         playRandomSound();
       }

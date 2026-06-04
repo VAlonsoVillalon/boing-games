@@ -19,14 +19,31 @@ function initPuzzleGame() {
   const game = document.getElementById('puzzleGame');
   game.innerHTML = '';
 
-  // Slots
+  // Slots con fantasmas de las piezas correctas
   const slotsContainer = document.createElement('div');
   slotsContainer.style.marginBottom = '2rem';
 
-  puzzlePieces.forEach((piece) => {
+  const shuffledForDisplay = [...puzzlePieces].sort(() => Math.random() - 0.5);
+
+  shuffledForDisplay.forEach((piece) => {
     const slot = document.createElement('div');
     slot.className = 'puzzle-slot';
     slot.dataset.target = piece.name;
+    slot.style.position = 'relative';
+    slot.style.overflow = 'hidden';
+    
+    // Fantasma de la pieza correcta (10% de opacidad)
+    const ghost = document.createElement('div');
+    ghost.style.position = 'absolute';
+    ghost.style.fontSize = '48px';
+    ghost.style.opacity = '0.1';
+    ghost.style.top = '50%';
+    ghost.style.left = '50%';
+    ghost.style.transform = 'translate(-50%, -50%)';
+    ghost.style.pointerEvents = 'none';
+    ghost.textContent = piece.emoji;
+    slot.appendChild(ghost);
+    
     slot.addEventListener('click', () => dropPuzzlePiece(slot, piece.name));
     slotsContainer.appendChild(slot);
   });
