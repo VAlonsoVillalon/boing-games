@@ -24,7 +24,7 @@ function initSimonGame() {
     round: 1
   };
 
-  const game = document.getElementById('numbersGame');
+  const game = document.getElementById('simonGame');
   game.innerHTML = '';
 
   // Contenedor principal
