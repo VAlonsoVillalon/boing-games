@@ -60,6 +60,11 @@
           <h3>Números</h3>
           <p>Cuenta objetos</p>
         </div>
+        <div class="game-card" data-game="simon" style="background: #F0E6FB; border: 2px solid #9966FF;">
+          <div class="game-icon">🎵</div>
+          <h3>Simon</h3>
+          <p>Memoriza secuencias</p>
+        </div>
       </div>
     </div>
 
@@ -116,6 +121,15 @@
       </div>
       <div id="numbersGame" class="numbers-game"></div>
     </div>
+
+    <!-- SIMON GAME -->
+    <div id="simonScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Simon - Memoriza la secuencia</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="simonGame" class="simon-game"></div>
+    </div>
   </div>
 
   <!-- WIN MODAL -->
@@ -134,6 +148,7 @@
   <script src="js/games/lines.js"></script>
   <script src="js/games/sounds.js"></script>
   <script src="js/games/numbers.js"></script>
+  <script src="js/games/simon.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

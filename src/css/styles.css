@@ -404,6 +404,42 @@ h1 {
   border-color: #cc0000;
 }
 
+/* SIMON GAME */
+.simon-game {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+#simonLevelInfo {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c2c2a;
+  margin: 1rem 0;
+}
+
+#simonGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.simon-btn {
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 100px;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.simon-btn:active {
+  transform: scale(0.95);
+}
+
 /* MODAL */
 .modal-overlay {
   position: fixed;

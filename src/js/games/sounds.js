@@ -1,8 +1,8 @@
 const soundAnimals = [
-  { name: 'gato', emoji: '🐱', sounds: [800, 1000] },
-  { name: 'perro', emoji: '🐶', sounds: [600, 400, 500] },
-  { name: 'vaca', emoji: '🐄', sounds: [200, 150] },
-  { name: 'pato', emoji: '🦆', sounds: [900, 850, 900] }
+  { name: 'gato', emoji: '🐱' },
+  { name: 'perro', emoji: '🐶' },
+  { name: 'vaca', emoji: '🐄' },
+  { name: 'pato', emoji: '🦆' }
 ];
 
 let soundState = {
@@ -36,7 +36,7 @@ function initSoundsGame() {
   playButton.style.fontWeight = '600';
   playButton.style.cursor = 'pointer';
   playButton.textContent = '🔊 Escucha el sonido';
-  playButton.addEventListener('click', () => playRandomSound());
+  playButton.addEventListener('click', () => playAnimalSound(soundState.currentAnimal));
 
   // Select random animal
   const animal = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
@@ -65,39 +65,67 @@ function initSoundsGame() {
   game.appendChild(buttonsContainer);
 
   // Play initial sound
-  setTimeout(() => playRandomSound(), 300);
+  setTimeout(() => playAnimalSound(soundState.currentAnimal), 300);
 }
 
-function playRandomSound() {
-  const animal = soundAnimals.find(a => a.name === soundState.currentAnimal);
-  if (!animal) return;
-
-  // Reproducir secuencia de sonidos
-  let delay = 0;
-  animal.sounds.forEach((freq, idx) => {
-    setTimeout(() => {
-      playBeep(freq, 0.15);
-    }, delay);
-    delay += 200;
-  });
-}
-
-function playBeep(frequency, duration = 0.15) {
+function playAnimalSound(animalName) {
   const audioContext = soundState.audioContext;
+  const now = audioContext.currentTime;
+
+  switch(animalName) {
+    case 'gato':
+      // Gato: Miau agudo y resonante
+      playFrequencyWithNoise(audioContext, 1500, 0.4, 'sine');
+      setTimeout(() => playFrequencyWithNoise(audioContext, 1800, 0.3, 'sine'), 200);
+      break;
+    case 'perro':
+      // Perro: Guau profundo con modulación
+      playFrequencyWithNoise(audioContext, 400, 0.5, 'triangle');
+      setTimeout(() => playFrequencyWithNoise(audioContext, 350, 0.4, 'triangle'), 300);
+      break;
+    case 'vaca':
+      // Vaca: Muuu muy profundo y largo
+      playFrequencyWithNoise(audioContext, 150, 0.6, 'sine');
+      break;
+    case 'pato':
+      // Pato: Cuac agudo repetido
+      playFrequencyWithNoise(audioContext, 800, 0.4, 'square');
+      setTimeout(() => playFrequencyWithNoise(audioContext, 750, 0.35, 'square'), 150);
+      setTimeout(() => playFrequencyWithNoise(audioContext, 800, 0.3, 'square'), 300);
+      break;
+  }
+}
+
+function playFrequencyWithNoise(audioContext, frequency, duration, waveType = 'sine') {
+  const now = audioContext.currentTime;
+  
+  // Oscilador principal
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
-
+  
+  oscillator.type = waveType;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  
+  // Modulación de frecuencia (vibrato)
+  const lfo = audioContext.createOscillator();
+  const lfoGain = audioContext.createGain();
+  lfo.frequency.value = 5; // Vibrato de 5Hz
+  lfoGain.gain.value = frequency * 0.05; // Modula 5% la frecuencia
+  
+  lfo.connect(oscillator.frequency);
   oscillator.connect(gainNode);
   gainNode.connect(audioContext.destination);
-
-  oscillator.frequency.value = frequency;
-  oscillator.type = 'sine';
-
-  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + duration);
+  
+  // Envolvente ADSR
+  gainNode.gain.setValueAtTime(0, now);
+  gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05); // Attack
+  gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration); // Decay
+  
+  oscillator.start(now);
+  lfo.start(now);
+  
+  oscillator.stop(now + duration);
+  lfo.stop(now + duration);
 }
 
 function checkSound(button, animalName) {
@@ -126,7 +154,7 @@ function checkSound(button, animalName) {
         
         soundState.currentAnimal = newAnimal.name;
         soundState.isDisabled = false;
-        playRandomSound();
+        playAnimalSound(soundState.currentAnimal);
       }
     }, 1000);
   } else {

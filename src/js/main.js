@@ -52,6 +52,9 @@ class GameManager {
       case 'numbers':
         initNumbersGame();
         break;
+      case 'simon':
+        initSimonGame();
+        break;
     }
   }
 

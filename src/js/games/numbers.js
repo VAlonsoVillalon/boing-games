@@ -2,18 +2,24 @@ const numberLevels = [
   { emoji: '🍎', count: 2 },
   { emoji: '⭐', count: 3 },
   { emoji: '🐠', count: 4 },
-  { emoji: '🌻', count: 5 }
+  { emoji: '🌻', count: 5 },
+  { emoji: '🎈', count: 2 },
+  { emoji: '🍌', count: 3 },
+  { emoji: '🦋', count: 4 },
+  { emoji: '🌈', count: 5 }
 ];
 
 let numberState = {
-  currentLevel: 0,
-  answered: []
+  currentLevelIndex: 0,
+  answered: [],
+  usedLevels: []
 };
 
 function initNumbersGame() {
   numberState = {
-    currentLevel: 0,
-    answered: []
+    currentLevelIndex: 0,
+    answered: [],
+    usedLevels: []
   };
 
   displayNumbersLevel();
@@ -23,7 +29,20 @@ function displayNumbersLevel() {
   const game = document.getElementById('numbersGame');
   game.innerHTML = '';
 
-  const level = numberLevels[numberState.currentLevel];
+  // Seleccionar un nivel no usado al azar
+  const availableLevels = numberLevels.filter((_, idx) => !numberState.usedLevels.includes(idx));
+  
+  if (availableLevels.length === 0) {
+    // Reiniciar si se acabaron los niveles
+    numberState.usedLevels = [];
+  }
+
+  const randomIdx = Math.floor(Math.random() * availableLevels.length);
+  const selectedLevel = availableLevels[randomIdx];
+  const actualIndex = numberLevels.indexOf(selectedLevel);
+  numberState.usedLevels.push(actualIndex);
+  
+  const level = selectedLevel;
 
   // Objects to count
   const container = document.createElement('div');
@@ -80,7 +99,6 @@ function checkNumber(button, selectedNum, correctNum) {
       if (numberState.answered.length === 4) {
         gameManager.showWinModal('¡Contaste todos correctamente! 🔢');
       } else {
-        numberState.currentLevel++;
         displayNumbersLevel();
       }
     }, 1000);
