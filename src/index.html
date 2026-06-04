@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Boing - Juegos educativos para niños pequeños (3+)">
+  <title>Boing - Juegos para niños</title>
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Google AdSense (descomentar cuando estés listo para monetizar) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"></script> -->
+</head>
+<body>
+  <div class="container">
+    <!-- HOME SCREEN -->
+    <div id="homeScreen" class="screen active">
+      <div class="header">
+        <svg class="mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="60" r="35" fill="#FF6B9D"/>
+          <circle cx="50" cy="35" r="28" fill="#FF6B9D"/>
+          <circle cx="38" cy="30" r="8" fill="#2c2c2a"/>
+          <circle cx="62" cy="30" r="8" fill="#2c2c2a"/>
+          <ellipse cx="50" cy="40" rx="4" ry="5" fill="#FFF"/>
+          <path d="M 45 45 Q 50 50 55 45" stroke="#2c2c2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="30" cy="55" r="6" fill="#7FFF00"/>
+          <circle cx="70" cy="55" r="6" fill="#7FFF00"/>
+        </svg>
+        <h1>Boing</h1>
+        <p class="subtitle">Juegos para pequeños exploradores</p>
+      </div>
+
+      <div class="games-grid">
+        <div class="game-card" data-game="memory" style="background: #E6F1FB; border: 2px solid #378ADD;">
+          <div class="game-icon">🧠</div>
+          <h3>Memoria</h3>
+          <p>Encuentra los pares</p>
+        </div>
+        <div class="game-card" data-game="colors" style="background: #FBEAF0; border: 2px solid #D4537E;">
+          <div class="game-icon">🎨</div>
+          <h3>Colores</h3>
+          <p>Empareja colores</p>
+        </div>
+        <div class="game-card" data-game="puzzle" style="background: #EAF3DE; border: 2px solid #639922;">
+          <div class="game-icon">🧩</div>
+          <h3>Puzzle</h3>
+          <p>Arma las piezas</p>
+        </div>
+        <div class="game-card" data-game="lines" style="background: #FAEEDA; border: 2px solid #BA7517;">
+          <div class="game-icon">✏️</div>
+          <h3>Líneas</h3>
+          <p>Sigue el camino</p>
+        </div>
+        <div class="game-card" data-game="sounds" style="background: #E1F5EE; border: 2px solid #1D9E75;">
+          <div class="game-icon">🔊</div>
+          <h3>Sonidos</h3>
+          <p>Identifica animales</p>
+        </div>
+        <div class="game-card" data-game="numbers" style="background: #FCEBEB; border: 2px solid #E24B4A;">
+          <div class="game-icon">🔢</div>
+          <h3>Números</h3>
+          <p>Cuenta objetos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMORY GAME -->
+    <div id="memoryScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Encuentra los pares</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="memoryGrid" class="memory-grid"></div>
+    </div>
+
+    <!-- COLORS GAME -->
+    <div id="colorsScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Empareja los colores</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="colorsGame" class="colors-game"></div>
+    </div>
+
+    <!-- PUZZLE GAME -->
+    <div id="puzzleScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Arma el puzzle</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="puzzleGame" class="puzzle-game"></div>
+    </div>
+
+    <!-- LINES GAME -->
+    <div id="linesScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Sigue la línea</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <canvas id="linesCanvas" class="lines-canvas" width="340" height="400"></canvas>
+    </div>
+
+    <!-- SOUNDS GAME -->
+    <div id="soundsScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Identifica los sonidos</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="soundsGame" class="sounds-game"></div>
+    </div>
+
+    <!-- NUMBERS GAME -->
+    <div id="numbersScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Cuenta los objetos</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="numbersGame" class="numbers-game"></div>
+    </div>
+  </div>
+
+  <!-- WIN MODAL -->
+  <div class="modal-overlay" id="winModal">
+    <div class="modal">
+      <h2>¡Ganaste! 🎉</h2>
+      <p id="winMessage">¡Excelente trabajo, campeón!</p>
+      <button class="btn-modal" onclick="location.href='#'">Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <!-- GAME SCRIPTS -->
+  <script src="js/games/memory.js"></script>
+  <script src="js/games/colors.js"></script>
+  <script src="js/games/puzzle.js"></script>
+  <script src="js/games/lines.js"></script>
+  <script src="js/games/sounds.js"></script>
+  <script src="js/games/numbers.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

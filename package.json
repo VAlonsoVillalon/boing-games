@@ -1,0 +1,26 @@
+{
+  "name": "boing-games",
+  "version": "1.0.0",
+  "description": "Juegos educativos para niños pequeños (3+). Desarrolla habilidades básicas de forma divertida.",
+  "main": "src/index.html",
+  "author": "Victor Alonso Villalon",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx http-server src -p 8000",
+    "build": "echo 'Static site - no build step needed'"
+  },
+  "keywords": [
+    "juegos",
+    "niños",
+    "educativo",
+    "desarrollo",
+    "infantil",
+    "memoria",
+    "colores",
+    "números"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VAlonsoVillalon/boing-games"
+  }
+}
