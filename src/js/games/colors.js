@@ -9,7 +9,8 @@ let colorState = {
   selected: null,
   matched: [],
   isChecking: false,
-  cards: []
+  cards: [],
+  wrong: 0
 };
 
 function initColorsGame() {
@@ -17,23 +18,21 @@ function initColorsGame() {
     selected: null,
     matched: [],
     isChecking: false,
-    cards: []
+    cards: [],
+    wrong: 0
   };
 
   const game = document.getElementById('colorsGame');
   game.innerHTML = '';
 
-  // Crear array con todos los elementos (8 totales: 2 de cada color)
   const allItems = [];
   colorPairs.forEach((pair) => {
     allItems.push({ color: pair.name, hex: pair.hex, emoji: pair.emojis[0] });
     allItems.push({ color: pair.name, hex: pair.hex, emoji: pair.emojis[1] });
   });
 
-  // Mezclar completamente
   const shuffled = allItems.sort(() => Math.random() - 0.5);
 
-  // Mostrar en grid 2x4
   const gridContainer = document.createElement('div');
   gridContainer.style.display = 'grid';
   gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
@@ -51,7 +50,7 @@ function initColorsGame() {
     card.dataset.emoji = item.emoji;
     card.textContent = item.emoji;
     card.addEventListener('click', () => selectColor(card));
-    
+
     gridContainer.appendChild(card);
     colorState.cards.push(card);
   });
@@ -78,6 +77,7 @@ function checkColorMatch(card1, card2) {
 
   setTimeout(() => {
     if (match) {
+      soundUtils.playCorrect();
       card1.classList.add('matched');
       card2.classList.add('matched');
       card1.style.opacity = '0.2';
@@ -87,11 +87,14 @@ function checkColorMatch(card1, card2) {
       colorState.matched.push(card1.dataset.color);
 
       if (colorState.matched.length === 4) {
+        const stars = colorState.wrong === 0 ? 3 : colorState.wrong <= 1 ? 2 : 1;
         setTimeout(() => {
-          gameManager.showWinModal('¡Emparejaste todos los colores! 🎨');
+          gameManager.showWinModal('¡Emparejaste todos los colores!', stars);
         }, 400);
       }
     } else {
+      soundUtils.playWrong();
+      colorState.wrong++;
       card1.classList.remove('selected');
       card2.classList.remove('selected');
     }

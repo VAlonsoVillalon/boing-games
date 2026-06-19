@@ -10,7 +10,6 @@ let simonState = {
   userSequence: [],
   isPlaying: false,
   level: 0,
-  audioContext: null,
   round: 1
 };
 
@@ -20,20 +19,17 @@ function initSimonGame() {
     userSequence: [],
     isPlaying: false,
     level: 0,
-    audioContext: new (window.AudioContext || window.webkitAudioContext)(),
     round: 1
   };
 
   const game = document.getElementById('simonGame');
   game.innerHTML = '';
 
-  // Contenedor principal
   const container = document.createElement('div');
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
   container.style.gap = '2rem';
 
-  // Info del nivel
   const levelInfo = document.createElement('div');
   levelInfo.id = 'simonLevelInfo';
   levelInfo.style.textAlign = 'center';
@@ -42,7 +38,6 @@ function initSimonGame() {
   levelInfo.style.color = '#2c2c2a';
   levelInfo.textContent = 'Nivel 1 - Escucha la secuencia';
 
-  // Grid de botones Simon
   const simonGrid = document.createElement('div');
   simonGrid.id = 'simonGrid';
   simonGrid.style.display = 'grid';
@@ -50,7 +45,7 @@ function initSimonGame() {
   simonGrid.style.gap = '12px';
   simonGrid.style.marginBottom = '2rem';
 
-  simonColors.forEach((color, idx) => {
+  simonColors.forEach((color) => {
     const btn = document.createElement('button');
     btn.className = 'simon-btn';
     btn.dataset.color = color.name;
@@ -66,7 +61,6 @@ function initSimonGame() {
     simonGrid.appendChild(btn);
   });
 
-  // Botón Start
   const startBtn = document.createElement('button');
   startBtn.id = 'simonStartBtn';
   startBtn.style.width = '100%';
@@ -99,26 +93,22 @@ function startSimonGame() {
 function playSimonRound() {
   simonState.isPlaying = true;
   simonState.userSequence = [];
-  
-  // Agregar nuevo color a la secuencia
+
   const randomColor = simonColors[Math.floor(Math.random() * simonColors.length)];
   simonState.sequence.push(randomColor);
   simonState.level = simonState.sequence.length;
 
-  // Actualizar info
   document.getElementById('simonLevelInfo').textContent = `Nivel ${simonState.level} - Escucha la secuencia`;
 
-  // Reproducir la secuencia
   let delay = 1000;
-  simonState.sequence.forEach((color, idx) => {
+  simonState.sequence.forEach((color) => {
     setTimeout(() => {
       flashButton(color.name);
-      playSound(color.sound);
+      playSimonSound(color.sound);
     }, delay);
     delay += 800;
   });
 
-  // Permitir al usuario jugar después
   setTimeout(() => {
     simonState.isPlaying = false;
     document.getElementById('simonLevelInfo').textContent = `Nivel ${simonState.level} - ¡Tu turno!`;
@@ -128,11 +118,11 @@ function playSimonRound() {
 function flashButton(colorName) {
   const buttons = document.querySelectorAll('.simon-btn');
   const btn = Array.from(buttons).find(b => b.dataset.color === colorName);
-  
+
   if (btn) {
     btn.style.transform = 'scale(0.95)';
     btn.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.5)';
-    
+
     setTimeout(() => {
       btn.style.transform = 'scale(1)';
       btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
@@ -146,24 +136,19 @@ function simonButtonClick(btn) {
   const colorName = btn.dataset.color;
   const sound = parseInt(btn.dataset.sound);
 
-  // Flash y sonido
   flashButton(colorName);
-  playSound(sound);
+  playSimonSound(sound);
 
-  // Agregar a la secuencia del usuario
   simonState.userSequence.push(colorName);
 
-  // Verificar
   const lastIndex = simonState.userSequence.length - 1;
   const expectedColor = simonState.sequence[lastIndex];
 
   if (simonState.userSequence[lastIndex] !== expectedColor) {
-    // Game Over
-    gameOver();
+    simonGameOver();
     return;
   }
 
-  // Si completó la secuencia
   if (simonState.userSequence.length === simonState.sequence.length) {
     setTimeout(() => {
       playSimonRound();
@@ -171,26 +156,28 @@ function simonButtonClick(btn) {
   }
 }
 
-function gameOver() {
+function simonGameOver() {
   simonState.isPlaying = true;
-  document.getElementById('simonLevelInfo').style.color = '#FF6B6B';
-  document.getElementById('simonLevelInfo').textContent = `¡Game Over! Llegaste al Nivel ${simonState.level}`;
-  
+  const levelInfoEl = document.getElementById('simonLevelInfo');
+  levelInfoEl.style.color = '#FF6B6B';
+  levelInfoEl.textContent = `¡Game Over! Llegaste al Nivel ${simonState.level}`;
+
+  const stars = simonState.level >= 6 ? 3 : simonState.level >= 4 ? 2 : 1;
   setTimeout(() => {
-    gameManager.showWinModal(`¡Excelente! Llegaste al nivel ${simonState.level} 🎵`);
+    gameManager.showWinModal(`¡Excelente! Llegaste al nivel ${simonState.level}`, stars);
   }, 2000);
 }
 
-function playSound(frequency) {
-  const audioContext = simonState.audioContext;
-  const now = audioContext.currentTime;
+function playSimonSound(frequency) {
+  const ctx = soundUtils.ctx;
+  const now = ctx.currentTime;
   const duration = 0.2;
 
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
+  const oscillator = ctx.createOscillator();
+  const gainNode = ctx.createGain();
 
   oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  gainNode.connect(ctx.destination);
 
   oscillator.frequency.value = frequency;
   oscillator.type = 'sine';

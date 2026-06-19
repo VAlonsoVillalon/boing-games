@@ -7,19 +7,20 @@ const puzzlePieces = [
 
 let puzzleState = {
   placed: [],
-  selectedPiece: null
+  selectedPiece: null,
+  wrong: 0
 };
 
 function initPuzzleGame() {
   puzzleState = {
     placed: [],
-    selectedPiece: null
+    selectedPiece: null,
+    wrong: 0
   };
 
   const game = document.getElementById('puzzleGame');
   game.innerHTML = '';
 
-  // Slots con fantasmas de las piezas correctas
   const slotsContainer = document.createElement('div');
   slotsContainer.style.marginBottom = '2rem';
 
@@ -31,8 +32,7 @@ function initPuzzleGame() {
     slot.dataset.target = piece.name;
     slot.style.position = 'relative';
     slot.style.overflow = 'hidden';
-    
-    // Fantasma de la pieza correcta (10% de opacidad)
+
     const ghost = document.createElement('div');
     ghost.style.position = 'absolute';
     ghost.style.fontSize = '48px';
@@ -43,12 +43,11 @@ function initPuzzleGame() {
     ghost.style.pointerEvents = 'none';
     ghost.textContent = piece.emoji;
     slot.appendChild(ghost);
-    
+
     slot.addEventListener('click', () => dropPuzzlePiece(slot, piece.name));
     slotsContainer.appendChild(slot);
   });
 
-  // Pieces
   const piecesContainer = document.createElement('div');
   piecesContainer.className = 'puzzle-pieces';
 
@@ -86,7 +85,7 @@ function dropPuzzlePiece(slot, targetName) {
   const pieceName = puzzleState.selectedPiece.dataset.piece;
 
   if (pieceName === targetName) {
-    // Correct!
+    soundUtils.playCorrect();
     slot.textContent = puzzleState.selectedPiece.textContent;
     slot.classList.add('filled');
     slot.style.pointerEvents = 'none';
@@ -99,12 +98,14 @@ function dropPuzzlePiece(slot, targetName) {
     puzzleState.selectedPiece = null;
 
     if (puzzleState.placed.length === 4) {
+      const stars = puzzleState.wrong === 0 ? 3 : puzzleState.wrong <= 1 ? 2 : 1;
       setTimeout(() => {
-        gameManager.showWinModal('¡Armaste el puzzle! 🧩');
+        gameManager.showWinModal('¡Armaste el puzzle!', stars);
       }, 500);
     }
   } else {
-    // Wrong - shake effect
+    soundUtils.playWrong();
+    puzzleState.wrong++;
     slot.style.animation = 'none';
     setTimeout(() => {
       slot.style.animation = 'shake 0.3s';

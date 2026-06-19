@@ -3,14 +3,16 @@ const memoryEmojis = ['🐱', '🐶', '🐸', '🦋', '🌸', '🍎', '🐱', '�
 let memoryState = {
   flipped: [],
   matched: [],
-  isChecking: false
+  isChecking: false,
+  totalFlips: 0
 };
 
 function initMemoryGame() {
   memoryState = {
     flipped: [],
     matched: [],
-    isChecking: false
+    isChecking: false,
+    totalFlips: 0
   };
 
   const grid = document.getElementById('memoryGrid');
@@ -40,6 +42,7 @@ function flipMemoryCard(card) {
 
   if (memoryState.flipped.length === 2) {
     memoryState.isChecking = true;
+    memoryState.totalFlips++;
     checkMemoryMatch();
   }
 }
@@ -48,7 +51,7 @@ function checkMemoryMatch() {
   const [card1, card2] = memoryState.flipped;
 
   if (card1.dataset.emoji === card2.dataset.emoji) {
-    // Match!
+    soundUtils.playCorrect();
     card1.classList.add('matched');
     card2.classList.add('matched');
     memoryState.matched.push(card1.dataset.emoji);
@@ -56,12 +59,13 @@ function checkMemoryMatch() {
     memoryState.isChecking = false;
 
     if (memoryState.matched.length === 6) {
+      const stars = memoryState.totalFlips < 8 ? 3 : memoryState.totalFlips < 10 ? 2 : 1;
       setTimeout(() => {
-        gameManager.showWinModal('¡Encontraste todos los pares! 🎉');
+        gameManager.showWinModal('¡Encontraste todos los pares!', stars);
       }, 500);
     }
   } else {
-    // No match
+    soundUtils.playWrong();
     setTimeout(() => {
       card1.textContent = '?';
       card2.textContent = '?';

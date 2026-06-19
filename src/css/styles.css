@@ -87,6 +87,13 @@ h1 {
   background: white;
 }
 
+.game-card:last-child:nth-child(odd) {
+  grid-column: span 2;
+  max-width: calc(50% - 6px);
+  margin: 0 auto;
+  width: 100%;
+}
+
 .game-card:active {
   transform: scale(0.95);
 }
@@ -491,12 +498,218 @@ h1 {
   .container {
     max-width: 100vw;
   }
-  
+
   .games-grid {
     grid-template-columns: 1fr;
   }
-  
+
   h1 {
     font-size: 28px;
   }
+}
+
+/* PROGRESS & STARS */
+.total-stars-display {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFB800;
+  margin-top: 6px;
+}
+
+.star-display {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #FFB800;
+  letter-spacing: 1px;
+}
+
+.star-empty {
+  color: #e0e0e0;
+}
+
+/* CONFETTI */
+.confetti-piece {
+  position: fixed;
+  top: -20px;
+  z-index: 2000;
+  pointer-events: none;
+  animation-name: confettiFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confettiFall {
+  0%   { top: -20px; transform: rotate(0deg) translateX(0); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { top: 110vh; transform: rotate(720deg) translateX(20px); opacity: 0; }
+}
+
+/* WIN MODAL STARS */
+.win-stars {
+  font-size: 36px;
+  color: #FFB800;
+  letter-spacing: 4px;
+  margin-bottom: 0.5rem;
+  min-height: 44px;
+}
+
+.win-star-empty {
+  color: #e0e0e0;
+}
+
+@keyframes modalPop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  60%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-overlay.active .modal {
+  animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* FORMAS GAME */
+.formas-game {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.formas-counter {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #888780;
+}
+
+.formas-target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem 1rem 1rem;
+  border: 2px solid #f0f0f0;
+  min-height: 160px;
+}
+
+.formas-question {
+  text-align: center;
+  color: #888780;
+  font-size: 14px;
+  margin-top: 1rem;
+}
+
+.formas-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.formas-choice-btn {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px 8px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 100px;
+  transition: border-color 0.2s, background 0.2s, transform 0.1s;
+}
+
+.formas-choice-btn:active {
+  transform: scale(0.95);
+}
+
+.formas-choice-btn.correct {
+  background: #e6ffe6;
+  border-color: #00cc00;
+}
+
+.formas-choice-btn.wrong {
+  background: #ffe6e6;
+  border-color: #cc0000;
+}
+
+.formas-label {
+  font-size: 11px;
+  color: #888780;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* LETRAS GAME */
+.letras-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.letras-counter {
+  font-size: 18px;
+  font-weight: 600;
+  color: #888780;
+}
+
+.letras-prompt {
+  font-size: 96px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 2px 3px 0 rgba(0,0,0,0.08);
+}
+
+.letras-question {
+  color: #888780;
+  font-size: 14px;
+  text-align: center;
+}
+
+.letras-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.letra-btn {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 48px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  min-height: 80px;
+  transition: border-color 0.2s, background 0.2s, transform 0.1s;
+}
+
+.letra-btn:active {
+  transform: scale(0.95);
+}
+
+.letra-btn.correct {
+  background: #e6ffe6;
+  border-color: #00cc00;
+}
+
+.letra-btn.wrong {
+  background: #ffe6e6;
+  border-color: #cc0000;
+}
+
+/* LINES ERROR */
+.lines-error {
+  text-align: center;
+  color: #cc0000;
+  font-size: 14px;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  min-height: 20px;
 }

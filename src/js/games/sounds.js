@@ -9,7 +9,8 @@ let soundState = {
   currentAnimal: null,
   answered: [],
   isDisabled: false,
-  audioContext: null
+  audioContext: null,
+  wrong: 0
 };
 
 function initSoundsGame() {
@@ -17,13 +18,13 @@ function initSoundsGame() {
     currentAnimal: null,
     answered: [],
     isDisabled: false,
-    audioContext: new (window.AudioContext || window.webkitAudioContext)()
+    audioContext: soundUtils.ctx,
+    wrong: 0
   };
 
   const game = document.getElementById('soundsGame');
   game.innerHTML = '';
 
-  // Crear botón para reproducir sonido
   const playButton = document.createElement('button');
   playButton.style.width = '100%';
   playButton.style.marginBottom = '2rem';
@@ -38,11 +39,9 @@ function initSoundsGame() {
   playButton.textContent = '🔊 Escucha el sonido';
   playButton.addEventListener('click', () => playAnimalSound(soundState.currentAnimal));
 
-  // Select random animal
   const animal = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
   soundState.currentAnimal = animal.name;
 
-  // Create buttons
   const buttonsContainer = document.createElement('div');
   buttonsContainer.style.display = 'grid';
   buttonsContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
@@ -64,31 +63,26 @@ function initSoundsGame() {
   game.appendChild(playButton);
   game.appendChild(buttonsContainer);
 
-  // Play initial sound
   setTimeout(() => playAnimalSound(soundState.currentAnimal), 300);
 }
 
 function playAnimalSound(animalName) {
   const audioContext = soundState.audioContext;
-  const now = audioContext.currentTime;
+  if (!audioContext) return;
 
-  switch(animalName) {
+  switch (animalName) {
     case 'gato':
-      // Gato: Miau agudo y resonante
       playFrequencyWithNoise(audioContext, 1500, 0.4, 'sine');
       setTimeout(() => playFrequencyWithNoise(audioContext, 1800, 0.3, 'sine'), 200);
       break;
     case 'perro':
-      // Perro: Guau profundo con modulación
       playFrequencyWithNoise(audioContext, 400, 0.5, 'triangle');
       setTimeout(() => playFrequencyWithNoise(audioContext, 350, 0.4, 'triangle'), 300);
       break;
     case 'vaca':
-      // Vaca: Muuu muy profundo y largo
       playFrequencyWithNoise(audioContext, 150, 0.6, 'sine');
       break;
     case 'pato':
-      // Pato: Cuac agudo repetido
       playFrequencyWithNoise(audioContext, 800, 0.4, 'square');
       setTimeout(() => playFrequencyWithNoise(audioContext, 750, 0.35, 'square'), 150);
       setTimeout(() => playFrequencyWithNoise(audioContext, 800, 0.3, 'square'), 300);
@@ -98,32 +92,30 @@ function playAnimalSound(animalName) {
 
 function playFrequencyWithNoise(audioContext, frequency, duration, waveType = 'sine') {
   const now = audioContext.currentTime;
-  
-  // Oscilador principal
+
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
-  
+
   oscillator.type = waveType;
   oscillator.frequency.setValueAtTime(frequency, now);
-  
-  // Modulación de frecuencia (vibrato)
+
   const lfo = audioContext.createOscillator();
   const lfoGain = audioContext.createGain();
-  lfo.frequency.value = 5; // Vibrato de 5Hz
-  lfoGain.gain.value = frequency * 0.05; // Modula 5% la frecuencia
-  
-  lfo.connect(oscillator.frequency);
+  lfo.frequency.value = 5;
+  lfoGain.gain.value = frequency * 0.05;
+
+  lfo.connect(lfoGain);
+  lfoGain.connect(oscillator.frequency);
   oscillator.connect(gainNode);
   gainNode.connect(audioContext.destination);
-  
-  // Envolvente ADSR
+
   gainNode.gain.setValueAtTime(0, now);
-  gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05); // Attack
-  gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration); // Decay
-  
+  gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
   oscillator.start(now);
   lfo.start(now);
-  
+
   oscillator.stop(now + duration);
   lfo.stop(now + duration);
 }
@@ -133,33 +125,31 @@ function checkSound(button, animalName) {
   soundState.isDisabled = true;
 
   if (animalName === soundState.currentAnimal) {
-    // Correct!
     button.classList.add('correct');
     soundState.answered.push(animalName);
 
     setTimeout(() => {
       if (soundState.answered.length === 4) {
-        gameManager.showWinModal('¡Identificaste todos los sonidos! 🔊');
+        const stars = soundState.wrong === 0 ? 3 : soundState.wrong <= 1 ? 2 : 1;
+        gameManager.showWinModal('¡Identificaste todos los sonidos!', stars);
       } else {
-        // Reset for next sound
         document.querySelectorAll('.sound-btn').forEach(btn => {
           btn.classList.remove('correct', 'wrong');
         });
-        
-        // Pick new animal
+
         let newAnimal;
         do {
           newAnimal = soundAnimals[Math.floor(Math.random() * soundAnimals.length)];
         } while (soundState.answered.includes(newAnimal.name));
-        
+
         soundState.currentAnimal = newAnimal.name;
         soundState.isDisabled = false;
         playAnimalSound(soundState.currentAnimal);
       }
     }, 1000);
   } else {
-    // Wrong
     button.classList.add('wrong');
+    soundState.wrong++;
     setTimeout(() => {
       button.classList.remove('wrong');
       soundState.isDisabled = false;
