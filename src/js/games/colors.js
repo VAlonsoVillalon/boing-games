@@ -75,9 +75,16 @@ function selectColor(element) {
 function checkColorMatch(card1, card2) {
   const match = card1.dataset.color === card2.dataset.color;
 
+  // Play sound immediately on user action, not after the visual delay
+  if (match) {
+    soundUtils.playCorrect();
+  } else {
+    soundUtils.playWrong();
+    colorState.wrong++;
+  }
+
   setTimeout(() => {
     if (match) {
-      soundUtils.playCorrect();
       card1.classList.add('matched');
       card2.classList.add('matched');
       card1.style.opacity = '0.2';
@@ -93,8 +100,6 @@ function checkColorMatch(card1, card2) {
         }, 400);
       }
     } else {
-      soundUtils.playWrong();
-      colorState.wrong++;
       card1.classList.remove('selected');
       card2.classList.remove('selected');
     }

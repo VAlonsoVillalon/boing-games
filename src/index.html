@@ -20,7 +20,7 @@
     <!-- HOME SCREEN -->
     <div id="homeScreen" class="screen active">
       <div class="header">
-        <svg class="mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <svg id="boingMascot" class="mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50" cy="60" r="35" fill="#FF6B9D"/>
           <circle cx="50" cy="35" r="28" fill="#FF6B9D"/>
           <circle cx="38" cy="30" r="8" fill="#2c2c2a"/>
@@ -82,6 +82,7 @@
           <p>Mayúsculas y minúsculas</p>
         </div>
       </div>
+      <p class="parent-hint">Mantén pulsado el personaje 3 seg · <strong>Zona Padres</strong></p>
     </div>
 
     <!-- MEMORY GAME -->
@@ -163,6 +164,47 @@
         <button class="btn-back" data-back-to="home">← Volver</button>
       </div>
       <div id="letrasGame" class="letras-game"></div>
+    </div>
+  </div>
+
+  <!-- PARENT ZONE -->
+  <div id="parentScreen" class="parent-overlay">
+    <div class="parent-panel">
+      <div class="parent-header">
+        <h2>👨‍👩‍👧 Zona Padres</h2>
+        <button class="parent-close" onclick="document.getElementById('parentScreen').classList.remove('active')">✕</button>
+      </div>
+
+      <div class="parent-card">
+        <h3>Progreso del niño</h3>
+        <p class="parent-total">⭐ Total: <strong><span id="parentTotalStars">0</span> estrellas</strong></p>
+        <table class="progress-table">
+          <thead>
+            <tr><th>Juego</th><th>Estrellas</th><th>Partidas</th></tr>
+          </thead>
+          <tbody id="parentProgressBody"></tbody>
+        </table>
+      </div>
+
+      <div class="parent-premium">
+        <h3>✨ Boing Premium</h3>
+        <p>Sin publicidad · Apoya el desarrollo de más juegos</p>
+        <a href="https://buy.stripe.com/XXXXXXXX" class="btn-premium" target="_blank" rel="noopener noreferrer">
+          Desbloquear Premium — $2.99
+        </a>
+      </div>
+
+      <!-- AdSense Banner (descomentar y añadir tu ca-pub-ID cuando estés listo) -->
+      <div class="parent-ad">
+        <!-- <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+        <p class="parent-ad-placeholder">Espacio publicitario<br><small>(configura tu ID de AdSense arriba)</small></p>
+      </div>
     </div>
   </div>
 

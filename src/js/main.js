@@ -2,8 +2,72 @@
 class GameManager {
   constructor() {
     this.currentGame = null;
+    this.checkPremium();
     this.setupEventListeners();
+    this.setupParentZoneTrigger();
     progressManager.renderAll();
+  }
+
+  checkPremium() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('premium');
+    if (token) {
+      localStorage.setItem('boing_premium', token);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    if (localStorage.getItem('boing_premium')) {
+      document.body.classList.add('is-premium');
+    }
+  }
+
+  setupParentZoneTrigger() {
+    const mascot = document.getElementById('boingMascot');
+    if (!mascot) return;
+    let pressTimer = null;
+
+    const startPress = () => {
+      mascot.classList.add('mascot-press');
+      pressTimer = setTimeout(() => {
+        mascot.classList.remove('mascot-press');
+        this.openParentScreen();
+      }, 3000);
+    };
+
+    const cancelPress = () => {
+      mascot.classList.remove('mascot-press');
+      clearTimeout(pressTimer);
+    };
+
+    mascot.addEventListener('mousedown', startPress);
+    mascot.addEventListener('touchstart', startPress, { passive: true });
+    mascot.addEventListener('mouseup', cancelPress);
+    mascot.addEventListener('mouseleave', cancelPress);
+    mascot.addEventListener('touchend', cancelPress);
+  }
+
+  openParentScreen() {
+    this.updateParentProgress();
+    document.getElementById('parentScreen').classList.add('active');
+  }
+
+  updateParentProgress() {
+    const data = progressManager.load();
+    const gameNames = {
+      memory: 'Memoria', colors: 'Colores', puzzle: 'Puzzle',
+      lines: 'Líneas', sounds: 'Sonidos', numbers: 'Números',
+      simon: 'Simon', formas: 'Formas', letras: 'Letras'
+    };
+    const tbody = document.getElementById('parentProgressBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    Object.entries(gameNames).forEach(([key, label]) => {
+      const g = data[key] || { stars: 0, plays: 0 };
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${label}</td><td>${'★'.repeat(g.stars)}${'☆'.repeat(3 - g.stars)}</td><td>${g.plays}</td>`;
+      tbody.appendChild(tr);
+    });
+    const totalEl = document.getElementById('parentTotalStars');
+    if (totalEl) totalEl.textContent = progressManager.getTotalStars();
   }
 
   setupEventListeners() {
@@ -95,7 +159,7 @@ function triggerConfetti() {
     const isCircle = Math.random() > 0.5;
     el.style.cssText = `left:${x}vw;width:${size}px;height:${isCircle ? size : Math.round(size * 1.6)}px;background:${color};border-radius:${isCircle ? '50%' : '2px'};animation-delay:${delay}s;animation-duration:${duration}s;`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), (delay + duration + 0.3) * 1000);
+    setTimeout(() => { if (el.parentNode) el.remove(); }, (delay + duration + 0.3) * 1000);
   }
 }
 

@@ -9,7 +9,6 @@ let soundState = {
   currentAnimal: null,
   answered: [],
   isDisabled: false,
-  audioContext: null,
   wrong: 0
 };
 
@@ -18,7 +17,6 @@ function initSoundsGame() {
     currentAnimal: null,
     answered: [],
     isDisabled: false,
-    audioContext: soundUtils.ctx,
     wrong: 0
   };
 
@@ -67,8 +65,8 @@ function initSoundsGame() {
 }
 
 function playAnimalSound(animalName) {
-  const audioContext = soundState.audioContext;
-  if (!audioContext) return;
+  // Always use the getter so we always get a live, resumed context
+  const audioContext = soundUtils.ctx;
 
   switch (animalName) {
     case 'gato':
@@ -115,7 +113,6 @@ function playFrequencyWithNoise(audioContext, frequency, duration, waveType = 's
 
   oscillator.start(now);
   lfo.start(now);
-
   oscillator.stop(now + duration);
   lfo.stop(now + duration);
 }

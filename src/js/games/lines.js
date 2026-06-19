@@ -6,9 +6,22 @@ let linesState = {
   totalPoints: 50
 };
 
+// Stored outside linesState so they survive the state reset on replay
+let linesHandlers = null;
+
 function initLinesGame() {
   const canvas = document.getElementById('linesCanvas');
   const ctx = canvas.getContext('2d');
+
+  // Remove old listeners before adding new ones (prevents accumulation on replay)
+  if (linesHandlers) {
+    canvas.removeEventListener('mousedown', linesHandlers.down);
+    canvas.removeEventListener('mousemove', linesHandlers.move);
+    canvas.removeEventListener('mouseup', linesHandlers.up);
+    canvas.removeEventListener('touchstart', linesHandlers.down);
+    canvas.removeEventListener('touchmove', linesHandlers.move);
+    canvas.removeEventListener('touchend', linesHandlers.up);
+  }
 
   canvas.width = canvas.offsetWidth;
   canvas.height = 400;
@@ -32,12 +45,18 @@ function initLinesGame() {
 
   drawLinesPath(ctx);
 
-  canvas.addEventListener('mousedown', (e) => startDrawing(e, canvas, ctx));
-  canvas.addEventListener('mousemove', (e) => drawLine(e, canvas, ctx));
-  canvas.addEventListener('mouseup', () => stopDrawing(canvas, ctx));
-  canvas.addEventListener('touchstart', (e) => startDrawing(e, canvas, ctx));
-  canvas.addEventListener('touchmove', (e) => drawLine(e, canvas, ctx));
-  canvas.addEventListener('touchend', () => stopDrawing(canvas, ctx));
+  linesHandlers = {
+    down: (e) => startDrawing(e, canvas, ctx),
+    move: (e) => drawLine(e, canvas, ctx),
+    up:   () => stopDrawing(canvas, ctx)
+  };
+
+  canvas.addEventListener('mousedown', linesHandlers.down);
+  canvas.addEventListener('mousemove', linesHandlers.move);
+  canvas.addEventListener('mouseup', linesHandlers.up);
+  canvas.addEventListener('touchstart', linesHandlers.down, { passive: true });
+  canvas.addEventListener('touchmove', linesHandlers.move, { passive: false });
+  canvas.addEventListener('touchend', linesHandlers.up);
 }
 
 function drawLinesPath(ctx) {
@@ -95,6 +114,7 @@ function startDrawing(e, canvas, ctx) {
 
 function drawLine(e, canvas, ctx) {
   if (!linesState.isDrawing) return;
+  if (e.cancelable) e.preventDefault();
 
   const rect = canvas.getBoundingClientRect();
   const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
