@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Boing - Juegos educativos para niños pequeños (3+)">
+  <meta name="theme-color" content="#FF6B9D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Boing - Juegos para niños</title>
   <link rel="stylesheet" href="css/styles.css">
-  
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+
   <!-- Google AdSense (descomentar cuando estés listo para monetizar) -->
   <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"></script> -->
 </head>
@@ -27,6 +32,7 @@
         </svg>
         <h1>Boing</h1>
         <p class="subtitle">Juegos para pequeños exploradores</p>
+        <div class="total-stars-display">⭐ <span id="totalStarsCount">0</span> estrellas</div>
       </div>
 
       <div class="games-grid">
@@ -64,6 +70,16 @@
           <div class="game-icon">🎵</div>
           <h3>Simon</h3>
           <p>Memoriza secuencias</p>
+        </div>
+        <div class="game-card" data-game="formas" style="background: #FFF0E6; border: 2px solid #FF8C42;">
+          <div class="game-icon">🔷</div>
+          <h3>Formas</h3>
+          <p>Identifica figuras</p>
+        </div>
+        <div class="game-card" data-game="letras" style="background: #EDE9FE; border: 2px solid #7C3AED;">
+          <div class="game-icon">🔤</div>
+          <h3>Letras</h3>
+          <p>Mayúsculas y minúsculas</p>
         </div>
       </div>
     </div>
@@ -130,18 +146,39 @@
       </div>
       <div id="simonGame" class="simon-game"></div>
     </div>
+
+    <!-- FORMAS GAME -->
+    <div id="formasScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>¿Qué forma es?</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="formasGame" class="formas-game"></div>
+    </div>
+
+    <!-- LETRAS GAME -->
+    <div id="letrasScreen" class="screen game-screen">
+      <div class="game-header">
+        <h2>Aprende las letras</h2>
+        <button class="btn-back" data-back-to="home">← Volver</button>
+      </div>
+      <div id="letrasGame" class="letras-game"></div>
+    </div>
   </div>
 
   <!-- WIN MODAL -->
   <div class="modal-overlay" id="winModal">
     <div class="modal">
       <h2>¡Ganaste! 🎉</h2>
+      <p id="winStars" class="win-stars"></p>
       <p id="winMessage">¡Excelente trabajo, campeón!</p>
-      <button class="btn-modal" onclick="location.href='#'">Jugar de nuevo</button>
+      <button class="btn-modal" onclick="gameManager.goHome()">Jugar de nuevo</button>
     </div>
   </div>
 
   <!-- GAME SCRIPTS -->
+  <script src="js/soundUtils.js"></script>
+  <script src="js/progress.js"></script>
   <script src="js/games/memory.js"></script>
   <script src="js/games/colors.js"></script>
   <script src="js/games/puzzle.js"></script>
@@ -149,6 +186,14 @@
   <script src="js/games/sounds.js"></script>
   <script src="js/games/numbers.js"></script>
   <script src="js/games/simon.js"></script>
+  <script src="js/games/formas.js"></script>
+  <script src="js/games/letras.js"></script>
   <script src="js/main.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>

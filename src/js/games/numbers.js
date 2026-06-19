@@ -12,14 +12,16 @@ const numberLevels = [
 let numberState = {
   currentLevelIndex: 0,
   answered: [],
-  usedLevels: []
+  usedLevels: [],
+  wrong: 0
 };
 
 function initNumbersGame() {
   numberState = {
     currentLevelIndex: 0,
     answered: [],
-    usedLevels: []
+    usedLevels: [],
+    wrong: 0
   };
 
   displayNumbersLevel();
@@ -29,11 +31,9 @@ function displayNumbersLevel() {
   const game = document.getElementById('numbersGame');
   game.innerHTML = '';
 
-  // Seleccionar un nivel no usado al azar
   const availableLevels = numberLevels.filter((_, idx) => !numberState.usedLevels.includes(idx));
-  
+
   if (availableLevels.length === 0) {
-    // Reiniciar si se acabaron los niveles
     numberState.usedLevels = [];
   }
 
@@ -41,10 +41,9 @@ function displayNumbersLevel() {
   const selectedLevel = availableLevels[randomIdx];
   const actualIndex = numberLevels.indexOf(selectedLevel);
   numberState.usedLevels.push(actualIndex);
-  
+
   const level = selectedLevel;
 
-  // Objects to count
   const container = document.createElement('div');
   container.className = 'objects-container';
 
@@ -55,7 +54,6 @@ function displayNumbersLevel() {
     container.appendChild(obj);
   }
 
-  // Number options
   const optionsContainer = document.createElement('div');
   optionsContainer.className = 'numbers-options';
 
@@ -91,22 +89,23 @@ function checkNumber(button, selectedNum, correctNum) {
   allButtons.forEach(btn => btn.disabled = true);
 
   if (selectedNum === correctNum) {
-    // Correct
+    soundUtils.playCorrect();
     button.classList.add('correct');
     numberState.answered.push(selectedNum);
 
     setTimeout(() => {
       if (numberState.answered.length === 4) {
-        gameManager.showWinModal('¡Contaste todos correctamente! 🔢');
+        const stars = numberState.wrong === 0 ? 3 : numberState.wrong <= 1 ? 2 : 1;
+        gameManager.showWinModal('¡Contaste todos correctamente!', stars);
       } else {
         displayNumbersLevel();
       }
     }, 1000);
   } else {
-    // Wrong
+    soundUtils.playWrong();
+    numberState.wrong++;
     button.classList.add('wrong');
 
-    // Show correct answer
     const correctBtn = Array.from(allButtons).find(btn => parseInt(btn.textContent) === correctNum);
     if (correctBtn) {
       correctBtn.classList.add('correct');
